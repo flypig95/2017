@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        .screen {
+            width: 500px;
+            height: 200px;
+            margin: 100px auto;
+            border: 1px solid #ccc;
+            padding: 7px;
+            position: relative;
+        }
+        .inner {
+            width: 500px;
+            height: 200px;
+            background-color: pink;
+            position: relative;
+            overflow: hidden;
+        }
+        .screen ul {
+            width: 600%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            list-style: none;
+        }
+        .screen ul li {
+            float: left;
+        }
+        .screen ol {
+            list-style: none;
+            position: absolute;
+            bottom: 7px;
+            right: 0;
+        }
+        .screen ol li {
+            float: left;
+            width: 18px;
+            height: 18px;
+            background-color: #fff;
+            margin-right: 10px;
+        }
+        .screen ol li.current {
+            background-color: orange;
+        }
+    </style>
+    <script>
+        //  封装匀速运动
+        function animate(obj,target){
+            clearInterval(obj.timer);  // 先清除定时器
+            var speed = obj.offsetLeft < target ? 15 : -15;  // 用来判断 应该 +  还是 -
+            obj.timer = setInterval(function() {
+                var result = target - obj.offsetLeft; // 因为他们的差值不会超过5
+                obj.style.left = obj.offsetLeft + speed + "px";
+                if(Math.abs(result)<=15)  // 如果差值不小于 5 说明到位置了
+                {
+                    clearInterval(obj.timer);
+                    obj.style.left = target + "px";  // 有5像素差距   我们直接跳转目标位置
+                }
+            },20)
+        }
+        window.onload = function () {
+            var box = document.getElementById("box");
+            var ul = box.children[0].children[0];
+            var li = ul.children[0].cloneNode(true);
+            ul.appendChild(li);
+
+            var ol = document.createElement("ol");
+            box.appendChild(ol);
+
+            ulis = ul.children;
+            for(var i = 0;i<ulis.length - 1;i++)
+            {
+                var oli = document.createElement("li");
+                ol.appendChild(oli);
+                oli.innerHTML = i + 1;
+            }
+            ol.children[0].className = "current";
+
+            //动画开始
+            var olis = ol.children;
+            for(var i = 0;i<olis.length;i++)
+            {
+                olis[i].index = i;
+
+                olis[i].onmouseover = function () {
+                    for(var j = 0;j<olis.length;j++)
+                    {
+                        olis[j].className = "";
+                    }
+                    this.className = "current";
+                    animate(ul,-this.index*500);
+
+                    key = square = this.index;
+                }
+
+            }
+
+
+            //自动播放,添加定时器
+            var key = 0;
+            var square = 0;
+            var timer = null;
+            timer = setInterval(autoplay,2000);
+            function autoplay() {
+                key++;
+                if(key>ulis.length-1)
+                {
+                    ul.style.left = 0;
+                    key = 1;
+                }
+                animate(ul,-key*500)
+
+                square++;
+                if(square>olis.length-1)
+                {
+                    square = 0;
+                }
+                for(var i = 0;i<olis.length;i++)
+                {
+                    olis[i].className = "";
+                }
+                olis[square].className = "current";
+            }
+
+            ol.onmouseover = function () {
+                clearInterval(timer);
+            }
+            ol.onmouseout = function () {
+                timer = setInterval(autoplay,2000);
+            }
+
+        }
+    </script>
+</head>
+<body>
+<div class="screen" id="box">
+    <div class="inner">
+        <ul>
+            <li><a href="#"><img src="images/taobao/1.jpg" alt=""></a></li>
+            <li><a href="#"><img src="images/taobao/2.jpg" alt=""></a></li>
+            <li><a href="#"><img src="images/taobao/3.jpg" alt=""></a></li>
+            <li><a href="#"><img src="images/taobao/4.jpg" alt=""></a></li>
+            <li><a href="#"><img src="images/taobao/5.jpg" alt=""></a></li>
+        </ul>
+    </div>
+
+</div>
+</body>
+</html>
